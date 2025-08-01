@@ -1,1 +1,4 @@
-
+StudentID,Name,Department,Subject,ExamTime,Password,Photo,Location
+S101,Pending Registration,CSE,Maths,9AM,,,
+S102,Pending Registration,CSE,Physics,9AM,,,
+S103,Pending Registration,EEE,Circuits,11AM,,,
