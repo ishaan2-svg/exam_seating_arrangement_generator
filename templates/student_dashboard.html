@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - {{ name }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .student-row:hover { background-color: #f8fafc; cursor: pointer; }
+        #studentTooltip { 
+            position: absolute; 
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1rem;
+            max-width: 300px;
+            z-index: 100;
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <span class="text-xl font-semibold">Exam Seating System</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900">{{ name }}</p>
+                        <p class="text-xs text-gray-500">Student #{{ student_id }}</p>
+                    </div>
+                    {% if photo_path %}
+                    <img class="w-10 h-10 rounded-full" src="{{ photo_path }}" alt="Profile photo">
+                    {% else %}
+                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-lg font-bold">
+                        {{ name[0] | upper if name else 'S' }}
+                    </div>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="text-red-600 hover:text-red-700 ml-4">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-4">
+                    {% for category, message in messages %}
+                        <div class="bg-{{ 'red' if category == 'danger' else 'green' if category == 'success' else 'blue' }}-100 border border-{{ 'red' if category == 'danger' else 'green' if category == 'success' else 'blue' }}-400 text-{{ 'red' if category == 'danger' else 'green' if category == 'success' else 'blue' }}-700 px-4 py-3 rounded relative mb-2" role="alert">
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                <h2 class="text-xl font-bold mb-4">Profile Information</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Full Name:</span>
+                        <span class="font-medium">{{ name }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Student ID:</span>
+                        <span class="font-medium">{{ student_id }}</span>
+                    </div>
+                    {% if exams and exams[0] %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Department:</span>
+                        <span class="font-medium">{{ exams[0].department }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                <h2 class="text-xl font-bold mb-4">Exam Schedule</h2>
+                {% if exams %}
+                <div class="space-y-4">
+                    {% for exam in exams %}
+                    <div class="p-4 border rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium">{{ exam.subject }}</span>
+                            <span class="text-sm text-gray-500">{{ exam.date }}</span>
+                        </div>
+                        <div class="text-sm">
+                            <p class="text-gray-600">Room: {{ exam.room }} | Seat: {{ exam.seat_no }}</p>
+                            <p class="text-gray-500">{{ exam.time }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-600">No upcoming exams scheduled.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

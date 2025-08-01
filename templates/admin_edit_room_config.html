@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Room Configuration - Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <span class="text-xl font-semibold">Admin Panel - Edit Room</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('admin_rooms_config') }}" class="text-gray-600 hover:text-gray-900 transition-colors">Back to Room List</a>
+                    <a href="{{ url_for('admin_dashboard') }}" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
+                    <a href="{{ url_for('logout') }}" class="text-red-600 hover:text-red-700 transition-colors">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-4 mb-4 text-sm rounded-lg {% if category == 'success' %}bg-green-100 text-green-800{% elif category == 'danger' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}" role="alert">
+                        <div class="flex">
+                            <svg class="w-4 h-4 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {% if category == 'success' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                {% elif category == 'danger' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                {% else %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                {% endif %}
+                            </svg>
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center mb-6">
+                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h1 class="text-2xl font-bold text-gray-900">Edit Room: {{ room.room_name }}</h1>
+                    <p class="text-gray-600">Update room configuration and constraints</p>
+                </div>
+            </div>
+
+            <!-- Room Information Summary -->
+            <div class="mb-8 p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-semibold text-gray-800 mb-3">Current Room Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm text-gray-600">Room Name</p>
+                            <p class="font-medium">{{ room.room_name }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm text-gray-600">Current Capacity</p>
+                            <p class="font-medium">{{ room.capacity }} seats</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm text-gray-600">Layout</p>
+                            <p class="font-medium">{{ room.layout_columns }}×{{ room.layout_rows }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('admin_edit_room_config', room_id=room.id) }}" class="space-y-6">
+                <!-- Basic Configuration -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Basic Configuration</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="capacity" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                Room Capacity *
+                            </label>
+                            <input type="number" id="capacity" name="capacity" value="{{ room.capacity }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                   required min="1" max="200">
+                            <p class="text-sm text-gray-500 mt-1">Maximum number of students that can be seated</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Room Status</label>
+                            <div class="p-3 bg-green-50 border border-green-200 rounded-md">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="text-sm font-medium text-green-800">Room is Active</span>
+                                </div>
+                                <p class="text-sm text-green-700 mt-1">This room is available for exam scheduling</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Constraint Settings -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Exam Constraints</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="max_subjects" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                                Max Subjects
+                            </label>
+                            <input type="number" id="max_subjects" name="max_subjects" value="{{ room.max_subjects }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                   min="1" max="50">
+                            <p class="text-sm text-gray-500 mt-1">Maximum different subjects allowed (leave empty for no limit)</p>
+                        </div>
+                        <div>
+                            <label for="max_branches" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                                Max Branches
+                            </label>
+                            <input type="number" id="max_branches" name="max_branches" value="{{ room.max_branches }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                   min="1" max="20">
+                            <p class="text-sm text-gray-500 mt-1">Maximum different branches allowed (leave empty for no limit)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layout Configuration -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Seating Layout</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="layout_columns" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+                                </svg>
+                                Layout Columns
+                            </label>
+                            <input type="number" id="layout_columns" name="layout_columns" value="{{ room.layout_columns }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                   min="3" max="20">
+                            <p class="text-sm text-gray-500 mt-1">Number of columns in the seating layout</p>
+                        </div>
+                        <div>
+                            <label for="layout_rows" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+                                </svg>
+                                Layout Rows
+                            </label>
+                            <input type="number" id="layout_rows" name="layout_rows" value="{{ room.layout_rows }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                   min="3" max="20">
+                            <p class="text-sm text-gray-500 mt-1">Number of rows in the seating layout</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Layout Preview -->
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Layout Preview</h4>
+                        <div class="flex items-center space-x-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                <span>Total positions: <span id="total-positions" class="font-medium">{{ room.layout_columns * room.layout_rows }}</span></span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                                <span>Capacity: <span id="capacity-display" class="font-medium">{{ room.capacity }}</span></span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
+                                <span>Utilization: <span id="utilization" class="font-medium">{{ ((room.capacity / (room.layout_columns * room.layout_rows)) * 100)|round(1) }}%</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Restrictions -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Academic Year Restrictions</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="year1" name="allowed_years" value="1" 
+                                   {% if '1' in room.allowed_years %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="year1" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Year 1</span>
+                                <span class="block text-xs text-gray-500">First year students</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="year2" name="allowed_years" value="2" 
+                                   {% if '2' in room.allowed_years %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="year2" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Year 2</span>
+                                <span class="block text-xs text-gray-500">Second year students</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="year3" name="allowed_years" value="3" 
+                                   {% if '3' in room.allowed_years %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="year3" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Year 3</span>
+                                <span class="block text-xs text-gray-500">Third year students</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="year4" name="allowed_years" value="4" 
+                                   {% if '4' in room.allowed_years %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="year4" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Year 4</span>
+                                <span class="block text-xs text-gray-500">Fourth year students</span>
+                            </label>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3">Select which academic years are allowed to take exams in this room</p>
+                </div>
+
+                <!-- Branch Restrictions -->
+                <div class="pb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Branch Restrictions</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="branchCS" name="allowed_branches" value="CS" 
+                                   {% if 'CS' in room.allowed_branches %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="branchCS" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Computer Science (CS)</span>
+                                <span class="block text-xs text-gray-500">Software, algorithms, programming</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="branchEC" name="allowed_branches" value="EC" 
+                                   {% if 'EC' in room.allowed_branches %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="branchEC" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Electronics (EC)</span>
+                                <span class="block text-xs text-gray-500">Circuits, communications, devices</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="branchME" name="allowed_branches" value="ME" 
+                                   {% if 'ME' in room.allowed_branches %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="branchME" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Mechanical (ME)</span>
+                                <span class="block text-xs text-gray-500">Mechanics, thermodynamics, design</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="branchEE" name="allowed_branches" value="EE" 
+                                   {% if 'EE' in room.allowed_branches %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="branchEE" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Electrical (EE)</span>
+                                <span class="block text-xs text-gray-500">Power systems, motors, control</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="branchCE" name="allowed_branches" value="CE" 
+                                   {% if 'CE' in room.allowed_branches %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="branchCE" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Civil (CE)</span>
+                                <span class="block text-xs text-gray-500">Construction, structures, materials</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="branchIT" name="allowed_branches" value="IT" 
+                                   {% if 'IT' in room.allowed_branches %}checked{% endif %} 
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="branchIT" class="ml-2 text-sm text-gray-700">
+                                <span class="font-medium">Information Technology (IT)</span>
+                                <span class="block text-xs text-gray-500">Networks, databases, systems</span>
+                            </label>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3">Select which academic branches are allowed to take exams in this room</p>
+                </div>
+
+                <!-- Configuration Tips -->
+                <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Configuration Tips
+                    </h3>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• <strong>Capacity vs Layout:</strong> Ensure layout positions (columns × rows) ≥ capacity for proper visualization</li>
+                        <li>• <strong>Conflict Reduction:</strong> Lower max subjects/branches values help reduce exam scheduling conflicts</li>
+                        <li>• <strong>Academic Separation:</strong> Use year/branch restrictions to organize exams by student level or department</li>
+                        <li>• <strong>Layout Efficiency:</strong> Aim for 70-90% utilization (capacity/total positions) for optimal seating distribution</li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-6">
+                    <div class="flex space-x-4">
+                        <button type="submit" 
+                                class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Update Room Configuration
+                        </button>
+                        <a href="{{ url_for('admin_rooms_config') }}" 
+                           class="bg-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-400 transition-colors font-medium flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Cancel
+                        </a>
+                    </div>
+                    
+                    <div class="text-sm text-gray-500">
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Changes take effect immediately
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Auto-calculate layout statistics
+        function updateLayoutStats() {
+            const columns = parseInt(document.getElementById('layout_columns').value) || 0;
+            const rows = parseInt(document.getElementById('layout_rows').value) || 0;
+            const capacity = parseInt(document.getElementById('capacity').value) || 0;
+            
+            const totalPositions = columns * rows;
+            const utilization = totalPositions > 0 ? ((capacity / totalPositions) * 100).toFixed(1) : 0;
+            
+            document.getElementById('total-positions').textContent = totalPositions;
+            document.getElementById('capacity-display').textContent = capacity;
+            document.getElementById('utilization').textContent = utilization + '%';
+            
+            // Update utilization color
+            const utilizationElement = document.getElementById('utilization');
+            const utilizationValue = parseFloat(utilization);
+            
+            if (utilizationValue > 100) {
+                utilizationElement.className = 'font-medium text-red-600';
+            } else if (utilizationValue >= 70 && utilizationValue <= 90) {
+                utilizationElement.className = 'font-medium text-green-600';
+            } else if (utilizationValue >= 50) {
+                utilizationElement.className = 'font-medium text-yellow-600';
+            } else {
+                utilizationElement.className = 'font-medium text-gray-600';
+            }
+        }
+
+        // Auto-suggest layout when capacity changes
+        function suggestLayout() {
+            const capacity = parseInt(document.getElementById('capacity').value);
+            if (capacity > 0) {
+                // Suggest optimal layout (slightly more columns than rows for better visibility)
+                const cols = Math.ceil(Math.sqrt(capacity * 1.3));
+                const rows = Math.ceil(capacity / cols);
+                
+                document.getElementById('layout_columns').value = cols;
+                document.getElementById('layout_rows').value = rows;
+                updateLayoutStats();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('capacity').addEventListener('input', function() {
+            updateLayoutStats();
+            // Auto-suggest layout if current layout is too small
+            const capacity = parseInt(this.value) || 0;
+            const columns = parseInt(document.getElementById('layout_columns').value) || 0;
+            const rows = parseInt(document.getElementById('layout_rows').value) || 0;
+            
+            if (capacity > columns * rows) {
+                suggestLayout();
+            }
+        });
+
+        document.getElementById('layout_columns').addEventListener('input', updateLayoutStats);
+        document.getElementById('layout_rows').addEventListener('input', updateLayoutStats);
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const capacity = parseInt(document.getElementById('capacity').value) || 0;
+            const columns = parseInt(document.getElementById('layout_columns').value) || 0;
+            const rows = parseInt(document.getElementById('layout_rows').value) || 0;
+            
+            if (capacity > columns * rows) {
+                e.preventDefault();
+                alert('Warning: Room capacity (' + capacity + ') exceeds layout positions (' + (columns * rows) + '). Please adjust the layout or capacity.');
+                return false;
+            }
+            
+            // Check if at least one year is selected
+            const yearCheckboxes = document.querySelectorAll('input[name="allowed_years"]:checked');
+            if (yearCheckboxes.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one allowed academic year.');
+                return false;
+            }
+            
+            // Check if at least one branch is selected
+            const branchCheckboxes = document.querySelectorAll('input[name="allowed_branches"]:checked');
+            if (branchCheckboxes.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one allowed branch.');
+                return false;
+            }
+        });
+
+        // Initialize on page load
+        updateLayoutStats();
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

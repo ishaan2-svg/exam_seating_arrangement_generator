@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Login - Exam Seating System</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+    }
+    .gradient-background {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+  </style>
+</head>
+<body class="gradient-background min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="glass-panel inline-block p-6">
+        <svg class="w-16 h-16 mx-auto text-white mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+        </svg>
+        <h1 class="text-3xl font-bold text-white">Exam Seating System</h1>
+        <p class="text-white/80 mt-2">Secure Access Portal</p>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-6 space-y-3">
+          {% for category, message in messages %}
+            <div class="p-3 rounded-lg text-sm border 
+              {% if category == 'danger' %}bg-red-100 text-red-700 border-red-200
+              {% elif category == 'success' %}bg-green-100 text-green-700 border-green-200
+              {% else %}bg-blue-100 text-blue-700 border-blue-200{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="glass-panel p-8">
+      <form class="space-y-6" action="{{ url_for('login') }}" method="post">
+        <div>
+          <label for="username" class="block text-sm font-medium text-white/90 mb-2">Username</label>
+          <input type="text" id="username" name="username" required
+                 class="w-full px-4 py-2.5 rounded-lg bg-white/20 border border-white/30 
+                        text-white placeholder-white/70 focus:ring-2 focus:ring-white focus:border-white
+                        transition-all duration-200"
+                 placeholder="Enter your username">
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-white/90 mb-2">Password</label>
+          <input type="password" id="password" name="password" required
+                 class="w-full px-4 py-2.5 rounded-lg bg-white/20 border border-white/30 
+                        text-white placeholder-white/70 focus:ring-2 focus:ring-white focus:border-white
+                        transition-all duration-200"
+                 placeholder="••••••••">
+        </div>
+
+        <div>
+          <label for="role" class="block text-sm font-medium text-white/90 mb-2">Login As</label>
+          <select id="role" name="role" required
+                  class="w-full px-4 py-2.5 rounded-lg bg-white/20 border border-white/30 
+                         text-white focus:ring-2 focus:ring-white focus:border-white
+                         [&_option]:text-gray-800">
+            <option value="">Select Role</option>
+            <option value="admin">Administrator</option>
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+          </select>
+        </div>
+
+        <div id="totpSection" class="hidden">
+          <label for="totp" class="block text-sm font-medium text-white/90 mb-2">2FA Code</label>
+          <input type="text" id="totp" name="totp" 
+                 class="w-full px-4 py-2.5 rounded-lg bg-white/20 border border-white/30 
+                        text-white placeholder-white/70 focus:ring-2 focus:ring-white focus:border-white
+                        transition-all duration-200"
+                 placeholder="6-digit authentication code"
+                 pattern="\d{6}"
+                 maxlength="6">
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <input id="remember" type="checkbox" 
+                   class="w-4 h-4 border border-white/30 rounded bg-white/20 
+                          focus:ring-2 focus:ring-white">
+            <label for="remember" class="ml-2 text-sm text-white/90">Remember me</label>
+          </div>
+          <a href="#" class="text-sm text-white/80 hover:text-white">Forgot password?</a>
+        </div>
+
+        <button type="submit" 
+                class="w-full bg-white/20 hover:bg-white/30 text-white py-3 rounded-lg
+                       font-medium transition-all duration-200 flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          Sign In
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="text-white/80">
+          New student? 
+          <a href="/register" class="text-white font-semibold hover:underline">
+            Create account
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const roleSelect = document.getElementById('role');
+      const totpSection = document.getElementById('totpSection');
+      const totpInput = document.getElementById('totp');
+
+      function toggle2FA() {
+        if (roleSelect.value === 'admin') {
+          totpSection.classList.remove('hidden');
+          totpInput.setAttribute('required', 'required');
+        } else {
+          totpSection.classList.add('hidden');
+          totpInput.removeAttribute('required');
+        }
+      }
+
+      roleSelect.addEventListener('change', toggle2FA);
+      toggle2FA(); // Initial check
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

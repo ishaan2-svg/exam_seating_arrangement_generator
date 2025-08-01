@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Exam Seating System</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-600 to-purple-700 min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Create an Account</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-4 space-y-2">
+          {% for category, message in messages %}
+            <div class="p-3 rounded text-sm border
+              {% if category == 'danger' %}bg-red-100 text-red-700 border-red-200
+              {% elif category == 'success' %}bg-green-100 text-green-700 border-green-200
+              {% else %}bg-blue-100 text-blue-700 border-blue-200{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('register') }}" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-gray-700 font-medium">Register As</label>
+        <select name="role" id="role" required class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          <option value="">Select Role</option>
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+        </select>
+      </div>
+
+      <!-- Student ID Field (only shown for students) -->
+      <div id="studentIdWrapper" class="hidden">
+        <label class="block text-gray-700 font-medium">
+          <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a1.994 1.994 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+          </svg>
+          Student ID *
+        </label>
+        <input type="text" name="student_id" id="student_id" 
+               class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+               placeholder="e.g., 1001, ST2023001, etc."
+               pattern="[A-Za-z0-9]+"
+               title="Only letters and numbers allowed (no spaces or special characters)">
+        <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-md mt-2">
+          <div class="flex">
+            <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.314 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <div>
+              <p class="text-sm font-medium text-yellow-800">Important</p>
+              <p class="text-sm text-yellow-700 mt-1">
+                Enter your Student ID exactly as it appears in the student records. If your ID is not found, contact the admin first. Only letters and numbers are allowed (no spaces).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-gray-700 font-medium">Username</label>
+          <input type="text" name="username" id="username" required 
+                 class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          <p id="usernameHelp" class="text-xs text-gray-500 mt-1">Choose a username for your account</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium">Email</label>
+          <input type="email" name="email" required 
+                 class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-gray-700 font-medium">Password</label>
+          <input type="password" name="password" required 
+                 class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium">Confirm Password</label>
+          <input type="password" name="confirm_password" required 
+                 class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+      </div>
+
+      <div id="assignedRoomWrapper" class="hidden">
+        <label class="block text-gray-700 font-medium">Assign Room (for Teachers)</label>
+        <select name="assigned_room" id="assigned_room" class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          <option value="">Select Room</option>
+          {% for room in available_rooms %}
+            <option value="{{ room.room_name }}">{{ room.room_name }} (Capacity: {{ room.capacity }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- 2FA Setup Section for Teachers -->
+      <div id="twoFactorSetup" class="hidden bg-gray-50 p-4 rounded-lg border">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">
+          <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+          Two-Factor Authentication Required
+        </h3>
+        <div class="bg-blue-50 border border-blue-200 p-3 rounded mb-4">
+          <p class="text-sm text-blue-800">
+            <strong>Important:</strong> Teachers must set up 2FA for security. After registration, you'll receive a QR code to scan with Google Authenticator or similar app.
+          </p>
+        </div>
+        
+        <div class="text-sm text-gray-600">
+          <p class="font-medium mb-2">Setup Instructions:</p>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>Install Google Authenticator or Authy on your phone</li>
+            <li>After registration, scan the QR code provided</li>
+            <li>Use the generated codes for admin panel access only</li>
+            <li>Regular login won't require 2FA codes</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Student Registration Notice -->
+      <div id="studentNotice" class="hidden bg-green-50 p-4 rounded-lg border border-green-200">
+        <h3 class="text-lg font-semibold text-green-800 mb-3">
+          <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+          Student Registration Process
+        </h3>
+        <div class="text-sm text-green-700">
+          <p class="font-medium mb-2">How it works:</p>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>Enter your Student ID exactly as it appears in school records</li>
+            <li>System will verify your ID against student database</li>
+            <li>Your Student ID will be used as your username (URL-safe)</li>
+            <li>If not found, contact admin to add your information first</li>
+            <li>No 2FA setup required for students</li>
+          </ol>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 transition duration-200 font-medium">
+        <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+        </svg>
+        Register
+      </button>
+
+      <p class="text-center text-sm text-gray-600 mt-4">
+        Already have an account? 
+        <a href="{{ url_for('login') }}" class="text-indigo-500 hover:underline font-medium">Login</a>
+      </p>
+    </form>
+  </div>
+
+  <script>
+    const roleSelect = document.getElementById('role');
+    const assignedWrapper = document.getElementById('assignedRoomWrapper');
+    const twoFactorSetup = document.getElementById('twoFactorSetup');
+    const studentIdWrapper = document.getElementById('studentIdWrapper');
+    const studentNotice = document.getElementById('studentNotice');
+    const studentIdInput = document.getElementById('student_id');
+    const usernameInput = document.getElementById('username');
+    const usernameHelp = document.getElementById('usernameHelp');
+
+    function toggleRoleSpecificFields() {
+      if (roleSelect.value === 'teacher') {
+        // Show teacher fields
+        assignedWrapper.classList.remove('hidden');
+        twoFactorSetup.classList.remove('hidden');
+        
+        // Hide student fields
+        studentIdWrapper.classList.add('hidden');
+        studentNotice.classList.add('hidden');
+        studentIdInput.removeAttribute('required');
+        
+        // Update username help text
+        usernameInput.setAttribute('required', 'required');
+        usernameHelp.textContent = 'Choose a username for your teacher account';
+        
+      } else if (roleSelect.value === 'student') {
+        // Show student fields
+        studentIdWrapper.classList.remove('hidden');
+        studentNotice.classList.remove('hidden');
+        studentIdInput.setAttribute('required', 'required');
+        
+        // Hide teacher fields
+        assignedWrapper.classList.add('hidden');
+        twoFactorSetup.classList.add('hidden');
+        
+        // Update username help text
+        usernameInput.removeAttribute('required');
+        usernameHelp.innerHTML = '<span class="text-yellow-600">⚠️ For students: Your Student ID will be used as username</span>';
+        
+      } else {
+        // Hide all role-specific fields
+        assignedWrapper.classList.add('hidden');
+        twoFactorSetup.classList.add('hidden');
+        studentIdWrapper.classList.add('hidden');
+        studentNotice.classList.add('hidden');
+        studentIdInput.removeAttribute('required');
+        usernameInput.setAttribute('required', 'required');
+        usernameHelp.textContent = 'Choose a username for your account';
+      }
+    }
+
+    roleSelect.addEventListener('change', toggleRoleSpecificFields);
+    window.addEventListener('DOMContentLoaded', toggleRoleSpecificFields);
+  </script>
+</body>
+</html>
